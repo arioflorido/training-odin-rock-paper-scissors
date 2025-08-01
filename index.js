@@ -1,12 +1,12 @@
 const Choices = {
-  Rock: "Rock",
-  Paper: "Paper",
-  Scissors: "Scissors",
+  Rock: "rock",
+  Paper: "paper",
+  Scissors: "scissors",
 };
 
 const Players = {
-  Player: "Player",
-  Computer: "Computer",
+  Player: "player",
+  Computer: "computer",
 };
 
 function getComputerChoice() {
@@ -19,34 +19,6 @@ function getComputerChoice() {
   }
   if (randomNumber > 6.66 && randomNumber <= 10) {
     return Choices.Scissors;
-  }
-}
-
-function getHumanChoice() {
-  let input;
-  const validChoices = [0, 1, 2];
-
-  while (!input) {
-    input = parseInt(
-      prompt(
-        `Choose: \n[0] - ${Choices.Rock} \n[1] - ${Choices.Paper} \n[2] - ${Choices.Scissors}`
-      )
-    );
-
-    // Reset input and display prompt if input is not valid
-    if (!validChoices.includes(input)) {
-      console.log("Invalid choice. Please try again.  ");
-      input = undefined;
-    }
-
-    switch (input) {
-      case 0:
-        return Choices.Rock;
-      case 1:
-        return Choices.Paper;
-      case 2:
-        return Choices.Scissors;
-    }
   }
 }
 
@@ -86,39 +58,64 @@ function playRound(humanChoice, computerChoice) {
   return { winner: undefined };
 }
 
-function playGame() {
-  console.log("Let's play rock, paper, scissors!");
-  let humanScore = 0;
-  let computerScore = 0;
-  let rounds = 5;
+const container = document.querySelector(".container");
+let playerScore = 0;
+let computerScore = 0;
+const winningScore = 5;
 
-  for (let round = 1; round <= rounds; round++) {
-    const humanChoice = getHumanChoice();
+const playerScoreContainer = document.createElement("p");
+const computerScoreContainer = document.createElement("p");
+
+playerScoreContainer.textContent = "Player : " + playerScore;
+computerScoreContainer.textContent = "Computer : " + computerScore;
+
+const roundResultContainer = document.createElement("p");
+const gameResultContainer = document.createElement("p");
+
+container.appendChild(playerScoreContainer);
+container.appendChild(computerScoreContainer);
+container.appendChild(roundResultContainer);
+container.appendChild(gameResultContainer);
+
+const buttons = document.querySelectorAll("button");
+
+buttons.forEach((button) => {
+  // and for each one we add a 'click' listener
+  button.addEventListener("click", () => {
+    const humanChoice = button.textContent.toLowerCase();
     const computerChoice = getComputerChoice();
-    const roundResult = playRound(humanChoice, computerChoice);
+    const winner = playRound(humanChoice, computerChoice)["winner"];
+    gameResultContainer.textContent = "";
 
-    console.log(`--- Round ${round} ---`);
-    if (!roundResult.winner) {
-      console.log(`It's a draw!`);
+    if (winner === Players.Player) {
+      playerScore++;
+      roundResultContainer.textContent = "Result : Player wins the round!";
+    } else if (winner === Players.Computer) {
+      computerScore++;
+      roundResultContainer.textContent =
+        "Round result : Computer wins the round!";
     } else {
-      if (roundResult.winner === Players.Computer) {
-        console.log(`You lose! ${computerChoice} beats ${humanChoice}`);
-        computerScore++;
-      } else {
-        console.log(`You win! ${humanChoice} beats ${computerChoice}`);
-
-        humanScore++;
-      }
+      roundResultContainer.textContent = "Round result : Draw!";
     }
-  }
+    playerScoreContainer.textContent = "Player : " + playerScore;
+    computerScoreContainer.textContent = "Computer : " + computerScore;
 
-  if (humanScore > computerScore) {
-    console.log(`${Players.Player} is the winner!`);
-  } else if (humanScore < computerScore) {
-    console.log(`${Players.Computer} is the winner!`);
-  } else {
-    console.log("It's a draw");
-  }
-}
+    if (playerScore === winningScore) {
+      gameResultContainer.textContent = "Player wins the game!";
+    } else if (computerScore === winningScore) {
+      gameResultContainer.textContent = "Computer wins the game!";
+    }
 
-playGame();
+    if (playerScore === winningScore || computerScore === winningScore) {
+      // Reset score
+      playerScore = 0;
+      computerScore = 0;
+    }
+  });
+});
+
+// TODOs
+// add constants and string templates
+// make code more DRY
+// add setup() function, will setup scoreboard
+// organize items to classes?
